@@ -1,3 +1,6 @@
+import pyperclip
+from deep_translator import GoogleTranslator
+
 def translated_buffer(langueage='ru', text='HELLO'):
     print(f"History:")
         
