@@ -1,0 +1,7 @@
+if 'напомни мне через час' in message.text.lower():
+   while True:
+    bot.send_message(message.chat.id, 'Добавлено')
+    time.sleep(60*60)
+    bot.send_message(message.chat.id, message.text)
+    break
+    
