@@ -1,0 +1,118 @@
+time_and_message = []
+
+
+@bot.message_handler(commands=['cycle'])
+def get_instuction_cycle(message):
+    bot.send_message(message.chat.id, f'/start_cycle - начало \n /annulment - отмена')
+
+@bot.message_handler(commands=['start_cycle']) # /start_cycle
+def cicle(message):
+    if len(time_and_message) == 0:
+        bot.send_message(message.chat.id, 'пусто')
+
+    bot.send_message(message.chat.id, f'Количество элементов: {len(time_and_message)}')
+    
+    global n
+    n=1
+    while time_and_message:
+        
+        print(time_and_message)
+        sleep(1)
+        for times in time_and_message:
+            print(times)
+            times[0] -= 1
+            if n > 1 or times[0] <= 1:
+                time_and_message.sort()
+                bot.send_message(message.chat.id, time_and_message[0][1])
+                del time_and_message[0]
+
+#TODO Первая функция расписания. С неё начинается всё время и дела
+def whil(message, timer=[1, 'test']):
+    print("RUN")
+    timer = mod_timer(message.text)[-1]
+    print('ИЗНЧАЛЬНО', timer)
+
+    if timer[0] <= 0:
+         bot.send_message(message.chat.id, f'Несостыковочка. \nЭто событие было {timer[0]} секунд назад!')
+    else:
+
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item_1 = types.KeyboardButton('/start_cycle')
+        item_2 = types.KeyboardButton('/annulment')
+        markup.add(item_1, item_2)
+        bot.send_message(message.chat.id, 'Планировщик:', parse_mode='html', reply_markup=markup)
+
+        time = datetime.datetime.now()
+        best_time =  str(int(time.strftime('%H')) + int(3)) + time.strftime(':%M:%S')
+        bot.send_message(message.chat.id, f'Добавлено\nСработает через {timer[0]} секунд\nТеперешнее время: {best_time}\n/start_cycle')
+        getting(message, timer)
+        print('END')
+
+
+def getting(message, timer):
+    bot.send_message(message.chat.id, 'GET')
+    time_and_message.append(timer)
+    print(time_and_message)
+
+#TODO DELIT
+@bot.message_handler(commands=['annulment'])
+def anulit(message):
+    print(mins)
+    global n
+    n = 2
+    print(mins)
+    bot.send_message(message.chat.id, f'ОТМЕНА')
+
+
+def mod_timer(message):
+    ready_text = 'Вы просили напомнить ' # заменять В и Через словами прошедшего типа
+    in_spisok = message.split()
+    num = ifers(in_spisok)
+    for word in in_spisok[1:]:
+        ready_text += f"{word} "
+    first_time_and_message.append([num, ready_text])
+    return first_time_and_message
+
+def ifers(in_spisok, num=1):
+    p = {'один': 1, 'два': 2, 'три': 3, 'четыре': 4, 'пять': 5, "шесть": 6, "семь": 7, "восемь": 8, "девять": 9, "десять": 10}
+    hour = 3600
+    try:
+        if in_spisok[2].isdigit() == True: # напомни через и время...
+            num = hour * int(in_spisok[2])
+            print(num)
+        elif 'в' in in_spisok[1:2]: # поиск в предложение на 2 и 3 позиции слово В и дальшение действия
+            num = count_seconds(in_spisok[2]) - 3 * hour
+
+        elif not 'через' in in_spisok[1]: # без указания времени будет автоматом час
+            num = hour
+
+        elif 'сeкунду' in in_spisok[2:3]:
+            pass
+
+        elif 'час' in in_spisok[2:3]: # с указанем только часа
+            num = hour
+
+        elif in_spisok[2] in p: # поиск именных цифр для определения промежутка сна
+            number_hours = p[in_spisok[2]]
+            num = hour * number_hours
+        return num
+    except:
+        print("ОШИБКА")
+        return 1
+
+def count_seconds(seconds):
+    get_time = timer(seconds)
+    best_time =  timer(time.strftime('%H:%M:%S'))
+    sleep_seconds = int(get_time) - int(best_time)
+    return sleep_seconds
+
+def timer(hours):
+    if len(hours) > 7:
+        h, m, s = hours.split(':')
+        seconds = int(h) * 3600 + int(m) * 60 + int(s)
+    elif len(hours) > 3:
+        h, m = hours.split(':')
+        seconds = int(h) * 3600 + int(m) * 60
+    else:
+        seconds = int(hours[0:]) * 3600
+    return seconds
